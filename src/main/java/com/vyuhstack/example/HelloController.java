@@ -13,7 +13,7 @@ import java.util.Map;
 public class HelloController {
 
     // The commit this process was started from, so each deploy is visible.
-    private static final String COMMIT = commit();
+    private static final String COMMIT = commit()
     private static final String STARTED_AT = Instant.now().toString();
 
     @GetMapping(value = "/", produces = MediaType.TEXT_HTML_VALUE)
