@@ -6,30 +6,30 @@ push go live.
 
 ## One-time VM setup
 
-Run on the VM with sudo:
+Run on the VM as a user with sudo (for example `vyuh-user`):
 
 ```bash
-apt update && apt install -y git openjdk-21-jdk-headless maven
+sudo apt update && sudo apt install -y git openjdk-21-jdk-headless maven
 
 # deploys run as vyuh-user in a non-interactive shell: this must print paths
-runuser -l vyuh-user -c 'command -v java mvn && java -version'
+sudo runuser -l vyuh-user -c 'command -v java mvn && java -version'
 ```
 
 A Maven build plus the running app need more than 1 GB of memory. Use a Small
 flavor or bigger, or add swap on a Nano VM:
 
 ```bash
-fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile
-echo '/swapfile none swap sw 0 0' >> /etc/fstab
+sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 ```
 
 Then connect the repo in VyuhStack (settings below) and click **Verify**, which
 clones it into `/opt/app`. After that, install the service:
 
 ```bash
-cp /opt/app/deploy/app.service /etc/systemd/system/app.service
-systemctl daemon-reload
-systemctl enable app
+sudo cp /opt/app/deploy/app.service /etc/systemd/system/app.service
+sudo systemctl daemon-reload
+sudo systemctl enable app
 ```
 
 The first deploy builds the jar and starts it.
@@ -53,8 +53,8 @@ touches it. The first build downloads the Maven dependencies and is slow; later
 builds reuse `~/.m2`.
 
 `sudo -n` needs passwordless sudo for `vyuh-user`. VyuhStack VMs have it by
-default; check with `runuser -l vyuh-user -c 'sudo -n true && echo ok'`.
-Otherwise add a rule with `visudo -f /etc/sudoers.d/vyuhstack-deploy`:
+default; check with `sudo runuser -l vyuh-user -c 'sudo -n true && echo ok'`.
+Otherwise add a rule with `sudo visudo -f /etc/sudoers.d/vyuhstack-deploy`:
 
 ```
 vyuh-user ALL=(root) NOPASSWD: /usr/bin/systemctl restart app
